@@ -3,410 +3,313 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة مَعْبَر - دليل التسهيلات لذوي الهمم</title>
-  <!-- Google Fonts: Cairo -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- Leaflet CSS for Map -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دليل الأماكن والمدن</title>
   <style>
     :root {
-      --primary-color: #0d8abc;
-      --primary-dark: #096890;
-      --secondary-color: #2eb872;
-      --bg-color: #f4f8fb;
+      --primary: #2563eb;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
-      --text-color: #2c3e50;
-      --text-muted: #6c757d;
-      --border-radius: 16px;
-      --box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Cairo', sans-serif;
+      --text: #1e293b;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
     }
 
-    /* --- الهيدر العلوي الموسّع والمريح للعين --- */
-    header {
-      background: linear-gradient(135deg, #0d8abc 0%, #17a2b8 50%, #2eb872 100%);
-      color: white;
-      padding: 45px 20px 55px 20px;
-      text-align: center;
-      border-radius: 0 0 32px 32px;
-      box-shadow: 0 8px 25px rgba(13, 138, 188, 0.25);
-      position: relative;
-    }
-
-    .badge {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.22);
-      backdrop-filter: blur(8px);
-      color: #fff;
-      padding: 6px 20px;
-      border-radius: 30px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    header h1 {
-      font-size: 2.8rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    }
-
-    header p {
-      font-size: 1.2rem;
-      opacity: 0.95;
-      font-weight: 500;
-    }
-
-    /* --- الحاوية الرئيسية --- */
     .container {
-      max-width: 1300px;
-      margin: -25px auto 40px auto;
-      padding: 0 20px;
-      width: 100%;
-      z-index: 10;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    /* --- أدوات البحث والتصفية --- */
-    .search-box {
-      background: var(--card-bg);
-      padding: 20px 25px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      margin-bottom: 25px;
+    h1 {
+      text-align: center;
+      color: var(--primary);
     }
 
-    .search-input-wrapper {
-      position: relative;
-      margin-bottom: 18px;
-    }
-
-    .search-input-wrapper input {
-      width: 100%;
-      padding: 14px 45px 14px 20px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .search-input-wrapper input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 4px rgba(13, 138, 188, 0.15);
-    }
-
-    .search-icon {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 1.2rem;
-    }
-
-    .category-buttons {
+    /* شريط التحكم: اختيار المدينة والتصفية */
+    .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .cat-btn {
-      background-color: #f0f4f8;
-      border: none;
-      color: var(--text-color);
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-weight: 600;
+    select, button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 15px;
       cursor: pointer;
-      transition: all 0.25s ease;
-      font-size: 0.95rem;
+      background: white;
     }
 
-    .cat-btn:hover, .cat-btn.active {
-      background-color: var(--primary-color);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(13, 138, 188, 0.3);
-    }
-
-    /* --- تخطيط المحتوى (الخريطة والنتائج) --- */
-    .content-layout {
-      display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      gap: 25px;
-    }
-
-    @media (max-width: 900px) {
-      .content-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    #map {
-      height: 600px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      z-index: 1;
-    }
-
-    /* --- قائمة النتائج --- */
-    .results-section {
+    .filters {
       display: flex;
-      flex-direction: column;
-      gap: 15px;
-      max-height: 600px;
-      overflow-y: auto;
-      padding-left: 5px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .results-count {
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-      font-size: 0.95rem;
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* شبكة عرض الأماكن */
+    .places-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 20px;
-      box-shadow: var(--box-shadow);
-      border-right: 5px solid var(--primary-color);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s;
     }
 
     .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
     }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      width: fit-content;
+    }
+
+    .badge-univ { background-color: #dbeafe; color: #1e40af; }
+    .badge-rest { background-color: #fee2e2; color: #991b1b; }
+    .badge-cafe { background-color: #fef3c7; color: #92400e; }
 
     .card h3 {
-      font-size: 1.25rem;
-      color: var(--primary-dark);
-      margin-bottom: 6px;
+      margin: 0 0 8px 0;
+      font-size: 18px;
     }
 
-    .card-meta {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      display: flex;
-      gap: 15px;
+    .card p {
+      margin: 0 0 16px 0;
+      color: #64748b;
+      font-size: 14px;
     }
 
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .map-btn {
+      display: inline-block;
+      text-align: center;
+      background-color: var(--primary);
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 500;
     }
 
-    .tag {
-      font-size: 0.8rem;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .tag-success {
-      background-color: #e8f8f0;
-      color: #1e7e48;
-    }
-
-    .tag-info {
-      background-color: #e6f4ea;
-      color: #137333;
+    .no-results {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 40px;
+      color: #94a3b8;
     }
   </style>
 </head>
 <body>
 
-  <!-- هيدر منصة معبر -->
-  <header>
-    <div class="badge">دليل التسهيلات لذوي الهمم</div>
-    <h1>مَنصّة مَعْبَر</h1>
-    <p>طريق أسهل... الوصول إلى أيسر</p>
-  </header>
-
   <div class="container">
-    <!-- مربع البحث والتصنيفات -->
-    <div class="search-box">
-      <div class="search-input-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث باسم المكان، المدينة أو التصنيف (مثلاً: جدة، مستشفى، كليّة)..." oninput="filterData()">
+    <h1>دليل الأماكن والمدن</h1>
+
+    <!-- شريط الاختيار والتصفية -->
+    <div class="controls">
+      <div>
+        <label for="citySelect"><strong>اختر المدينة:</strong> </label>
+        <select id="citySelect" onchange="renderPlaces()">
+          <option value="jeddah">جدة</option>
+          <option value="riyadh">الرياض</option>
+        </select>
       </div>
-      <div class="category-buttons">
-        <button class="cat-btn active" onclick="filterCategory('الكل')">جميع الأماكن</button>
-        <button class="cat-btn" onclick="filterCategory('مستشفيات')">🏥 مستشفيات</button>
-        <button class="cat-btn" onclick="filterCategory('دوائر حكومية')">🏛️ دوائر حكومية ومحاكم</button>
-        <button class="cat-btn" onclick="filterCategory('جامعات وكليات')">🎓 جامعات وكليات</button>
-        <button class="cat-btn" onclick="filterCategory('مطاعم وكافيهات')">🍽️ مطاعم وكافيهات</button>
+
+      <div class="filters">
+        <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
+        <button class="filter-btn" onclick="setFilter('university', this)">جامعات</button>
+        <button class="filter-btn" onclick="setFilter('restaurant', this)">مطاعم</button>
+        <button class="filter-btn" onclick="setFilter('cafe', this)">كافيهات</button>
       </div>
     </div>
 
-    <!-- التخطيط الرئيسي: الخريطة والنتائج -->
-    <div class="content-layout">
-      <div id="map"></div>
-
-      <div class="results-section">
-        <div class="results-count" id="resultsCount">عرض النتائج...</div>
-        <div id="cardsList"></div>
-      </div>
-    </div>
+    <!-- كروت الأماكن -->
+    <div id="placesGrid" class="places-grid"></div>
   </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // قائمة الأماكن الشاملة (القديمة + الجديدة بالكامل)
-    const places = [
-      // --- المستشفيات القديمة والجديدة ---
-      { name: "مستشفى الملك فهد للقوات المسلحة", city: "جدة", category: "مستشفيات", lat: 21.5133, lng: 39.1728, features: ["مصعد متوفر", "موقف مخصص", "دورة مجهزة"] },
-      { name: "مستشفى الملك فيصل التخصصي", city: "جدة", category: "مستشفيات", lat: 21.5562, lng: 39.1578, features: ["مصعد متوفر", "موقف مخصص", "دورة مجهزة"] },
-      { name: "مستشفى الأطباء المتحدون", city: "جدة", category: "مستشفيات", lat: 21.5288, lng: 39.1555, features: ["موقف مخصص", "مدخل منحدر", "دورة مجهزة"] },
-      { name: "مستشفى الحبيب", city: "جدة", category: "مستشفيات", lat: 21.5780, lng: 39.1320, features: ["موقف مخصص", "مصعد متوفر", "خدمات مساعدة"] },
-      { name: "مستشفى الحبيب", city: "الرياض", category: "مستشفيات", lat: 24.7136, lng: 46.6753, features: ["موقف مخصص", "مصعد متوفر", "مدخل مجهز"] },
-      { name: "مستشفى الملك فيصل التخصصي", city: "الرياض", category: "مستشفيات", lat: 24.6708, lng: 46.6780, features: ["مصعد متوفر", "موقف مخصص", "دورة مجهزة"] },
-      { name: "مدينة الملك عبد الله الطبية", city: "مكة المكرمة", category: "مستشفيات", lat: 21.3601, lng: 39.9272, features: ["موقف مخصص", "مدخل منحدر", "دورة مجهزة"] },
-      { name: "مستشفى الشميسي (مدينة الملك سعود الطبية)", city: "الرياض", category: "مستشفيات", lat: 24.6282, lng: 46.7020, features: ["مصعد متوفر", "موقف مخصص"] },
-      { name: "مركز جونز هوبكنز أرامكو الطبي", city: "الظهران", category: "مستشفيات", lat: 26.3045, lng: 50.1380, features: ["موقف مخصص", "مدخل منحدر", "دورة مجهزة"] },
-      { name: "مدينة الملك عبد العزيز الطبية", city: "الرياض", category: "مستشفيات", lat: 24.7335, lng: 46.8520, features: ["مصعد متوفر", "موقف مخصص"] },
-      { name: "مدينة الملك فهد الطبية", city: "الرياض", category: "مستشفيات", lat: 24.6908, lng: 46.7032, features: ["موقف مخصص", "مصعد متوفر", "دورة مجهزة"] },
-      { name: "المستشفى السعودي الألماني", city: "جدة", category: "مستشفيات", lat: 21.6183, lng: 39.1601, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "المستشفى السعودي الألماني", city: "الرياض", category: "مستشفيات", lat: 24.8115, lng: 46.6341, features: ["موقف مخصص", "مصعد متوفر"] },
-      { name: "المستشفى السعودي الألماني", city: "أبها", category: "مستشفيات", lat: 18.2391, lng: 42.5482, features: ["موقف مخصص", "مدخل مجهز"] },
-      { name: "مستشفى الحياة", city: "أبها", category: "مستشفيات", lat: 18.2210, lng: 42.5080, features: ["موقف مخصص", "مصعد متوفر"] },
-      { name: "مستشفى أبها الخاص", city: "أبها", category: "مستشفيات", lat: 18.2165, lng: 42.5052, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "مدينة الملك عبد العزيز الطبية", city: "جدة", category: "مستشفيات", lat: 21.4925, lng: 39.2785, features: ["مصعد متوفر", "موقف مخصص"] },
-      { name: "المركز الطبي الدولي", city: "جدة", category: "مستشفيات", lat: 21.5165, lng: 39.1762, features: ["موقف مخصص", "دورة مجهزة", "مصعد"] },
+    // قاعدة البيانات لجميع الأماكن حسب المدينة
+    const data = {
+      jeddah: [
+        // جامعات جدة
+        {
+          name: "جامعة الملك عبد العزيز",
+          type: "university",
+          categoryName: "جامعة",
+          desc: "حي السليمانية، جدة",
+          mapUrl: "https://maps.google.com/?q=King+Abdulaziz+University+Jeddah"
+        },
+        {
+          name: "جامعة جدة",
+          type: "university",
+          categoryName: "جامعة",
+          desc: "طريق عسفان، جدة",
+          mapUrl: "https://maps.google.com/?q=University+of+Jeddah"
+        },
+        {
+          name: "جامعة عفت",
+          type: "university",
+          categoryName: "جامعة",
+          desc: "حي النزلة اليمانية، جدة",
+          mapUrl: "https://maps.google.com/?q=Effat+University+Jeddah"
+        },
+        {
+          name: "جامعة دار الحكمة",
+          type: "university",
+          categoryName: "جامعة",
+          desc: "حي الفيحاء، جدة",
+          mapUrl: "https://maps.google.com/?q=Dar+Al-Hekma+University+Jeddah"
+        },
 
-      // --- المحاكم والدوائر الحكومية ومراكز الشرطة ---
-      { name: "المحكمة العامة", city: "جدة", category: "دوائر حكومية", lat: 21.5432, lng: 39.1721, features: ["موقف مخصص", "مصعد متوفر"] },
-      { name: "المحكمة العامة", city: "أبها", category: "دوائر حكومية", lat: 18.2161, lng: 42.5058, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "المحكمة العامة", city: "الرياض", category: "دوائر حكومية", lat: 24.6322, lng: 46.7111, features: ["مصعد متوفر", "موقف مخصص"] },
-      { name: "المحكمة العامة", city: "الدمام", category: "دوائر حكومية", lat: 26.4320, lng: 50.1040, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "المحكمة العامة", city: "الخبر", category: "دوائر حكومية", lat: 26.2880, lng: 50.2010, features: ["موقف مخصص", "مصعد متوفر"] },
+        // مطاعم جدة
+        {
+          name: "مطعم البيك",
+          type: "restaurant",
+          categoryName: "مطعم",
+          desc: "فرع الخالدية، جدة",
+          mapUrl: "https://maps.google.com/?q=ALBAIK+Jeddah"
+        },
+        {
+          name: "مطعم خيال",
+          type: "restaurant",
+          categoryName: "مطعم",
+          desc: "طريق الأمير سلطان، جدة",
+          mapUrl: "https://maps.google.com/?q=Khayal+Restaurant+Jeddah"
+        },
+        {
+          name: "مطعم الشرقية للمأكولات البحرية",
+          type: "restaurant",
+          categoryName: "مطعم",
+          desc: "حي الحمراء، جدة",
+          mapUrl: "https://maps.google.com/?q=Al+Sharqia+Seafood+Jeddah"
+        },
 
-      { name: "وزارة الداخلية (فرع)", city: "جدة", category: "دوائر حكومية", lat: 21.5201, lng: 39.1688, features: ["موقف مخصص", "دورة مجهزة"] },
-      { name: "وزارة الداخلية (فرع)", city: "مكة المكرمة", category: "دوائر حكومية", lat: 21.4225, lng: 39.8262, features: ["موقف مخصص", "مصعد"] },
-      { name: "وزارة الداخلية (فرع)", city: "أبها", category: "دوائر حكومية", lat: 18.2250, lng: 42.5088, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "وزارة الداخلية (فرع)", city: "الدمام", category: "دوائر حكومية", lat: 26.4281, lng: 50.0982, features: ["موقف مخصص", "مصعد"] },
-      { name: "وزارة الداخلية (فرع)", city: "الظهران", category: "دوائر حكومية", lat: 26.3011, lng: 50.1412, features: ["موقف مخصص"] },
+        // كافيهات جدة
+        {
+          name: "برو جراوندز (Brew92)",
+          type: "cafe",
+          categoryName: "كافيه",
+          desc: "شارع الخالدية، جدة",
+          mapUrl: "https://maps.google.com/?q=Brew92+Jeddah"
+        },
+        {
+          name: "برو كافيه (Boho Cafe)",
+          type: "cafe",
+          categoryName: "كافيه",
+          desc: "حي المحمدية، جدة",
+          mapUrl: "https://maps.google.com/?q=Boho+Cafe+Jeddah"
+        },
+        {
+          name: "مد كافيه (MEDd Coffee)",
+          type: "cafe",
+          categoryName: "كافيه",
+          desc: "حي الشاطئ، جدة",
+          mapUrl: "https://maps.google.com/?q=MEDd+Coffee+Jeddah"
+        }
+      ],
+      riyadh: [
+        {
+          name: "جامعة الملك سعود",
+          type: "university",
+          categoryName: "جامعة",
+          desc: "الدرعية، الرياض",
+          mapUrl: "https://maps.google.com/?q=King+Saud+University+Riyadh"
+        },
+        {
+          name: "مطعم القرية النجديّة",
+          type: "restaurant",
+          categoryName: "مطعم",
+          desc: "حي العليا، الرياض",
+          mapUrl: "https://maps.google.com/?q=Najd+Village+Riyadh"
+        },
+        {
+          name: "إل كافين كافيه (Elixir Bunn)",
+          type: "cafe",
+          categoryName: "كافيه",
+          desc: "حي النخيل، الرياض",
+          mapUrl: "https://maps.google.com/?q=Elixir+Bunn+Riyadh"
+        }
+      ]
+    };
 
-      { name: "مركز الشرطة", city: "أبها", category: "دوائر حكومية", lat: 18.2190, lng: 42.5011, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "مركز الشرطة (الكورنيش)", city: "جدة", category: "دوائر حكومية", lat: 21.5311, lng: 39.1601, features: ["موقف مخصص"] },
-      { name: "مركز الشرطة (العزيزية)", city: "مكة المكرمة", category: "دوائر حكومية", lat: 21.4110, lng: 39.8550, features: ["موقف مخصص"] },
-      { name: "مركز الشرطة (الملز)", city: "الرياض", category: "دوائر حكومية", lat: 24.6610, lng: 46.7288, features: ["موقف مخصص", "مدخل منحدر"] },
+    let currentFilter = 'all';
 
-      // --- الجامعات والكليات ---
-      { name: "كلية الاتصالات والمعلومات", city: "جدة", category: "جامعات وكليات", lat: 21.4880, lng: 39.2431, features: ["مصعد متوفر", "موقف مخصص", "دورة مجهزة"] },
-      { name: "كلية الاتصالات والمعلومات", city: "الرياض", category: "جامعات وكليات", lat: 24.7180, lng: 46.7320, features: ["مصعد متوفر", "موقف مخصص", "دورة مجهزة"] },
-      { name: "الكلية التقنية", city: "جدة", category: "جامعات وكليات", lat: 21.4920, lng: 39.2510, features: ["موقف مخصص", "مدخل منحدر"] },
-      { name: "الكلية التقنية", city: "الرياض", category: "جامعات وكليات", lat: 24.6850, lng: 46.7100, features: ["موقف مخصص", "مصعد"] },
-      { name: "الكلية التقنية", city: "أبها", category: "جامعات وكليات", lat: 18.2410, lng: 42.5320, features: ["موقف مخصص", "مدخل منحدر"] },
-
-      // --- المطاعم والكافيهات ---
-      { name: "كافيه ومطعم بتيل (Bateel)", city: "الرياض", category: "مطاعم وكافيهات", lat: 24.7001, lng: 46.6850, features: ["موقف مخصص", "مدخل مخصص كراسي"] },
-      { name: "مطعم البيك", city: "جدة", category: "مطاعم وكافيهات", lat: 21.5422, lng: 39.1722, features: ["مدخل مجهز", "خدمة سريعة"] },
-      { name: "كافيه جافا تايم", city: "الرياض", category: "مطاعم وكافيهات", lat: 24.7112, lng: 46.6621, features: ["مدخل مجهز", "موقف مخصص"] },
-      { name: "مطعم الرفاعي والحدائق", city: "أبها", category: "مطاعم وكافيهات", lat: 18.2280, lng: 42.5090, features: ["جلسات أرضية مجهزة", "موقف"] },
-      { name: "كافيه الين", city: "مكة المكرمة", category: "مطاعم وكافيهات", lat: 21.4310, lng: 39.8210, features: ["مصعد متوفر", "جلسات واسعة"] }
-    ];
-
-    let currentCategory = 'الكل';
-    let map;
-    let markers = [];
-
-    // تهيئة الخريطة
-    function initMap() {
-      map = L.map('map').setView([23.8859, 45.0792], 6); // تتوسط المملكة العربية السعودية
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-
-      renderData();
+    function setFilter(filterType, btn) {
+      currentFilter = filterType;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPlaces();
     }
 
-    // عرض البيانات والبطاقات
-    function renderData() {
-      const searchVal = document.getElementById('searchInput').value.toLowerCase();
-      const listContainer = document.getElementById('cardsList');
-      
-      // مسح العلامات القائمة من الخريطة
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-      listContainer.innerHTML = '';
+    function renderPlaces() {
+      const cityKey = document.getElementById('citySelect').value;
+      const grid = document.getElementById('placesGrid');
+      grid.innerHTML = '';
 
-      const filtered = places.filter(place => {
-        const matchesCategory = (currentCategory === 'الكل' || place.category === currentCategory);
-        const matchesSearch = place.name.toLowerCase().includes(searchVal) || 
-                              place.city.toLowerCase().includes(searchVal) ||
-                              place.category.toLowerCase().includes(searchVal);
-        return matchesCategory && matchesSearch;
-      });
+      const places = data[cityKey] || [];
+      const filtered = currentFilter === 'all' 
+        ? places 
+        : places.filter(p => p.type === currentFilter);
 
-      document.getElementById('resultsCount').innerText = `عدد النتائج المعروضة: ${filtered.length}`;
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="no-results">لا توجد أماكن مطابقة للبحث حالياً.</div>';
+        return;
+      }
 
       filtered.forEach(place => {
-        // إضافة بطاقة العرض
+        let badgeClass = 'badge-univ';
+        if (place.type === 'restaurant') badgeClass = 'badge-rest';
+        if (place.type === 'cafe') badgeClass = 'badge-cafe';
+
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <h3>${place.name}</h3>
-          <div class="card-meta">
-            <span>📍 ${place.city}</span>
-            <span>📂 ${place.category}</span>
+          <div>
+            <span class="badge ${badgeClass}">${place.categoryName}</span>
+            <h3>${place.name}</h3>
+            <p>${place.desc}</p>
           </div>
-          <div class="tags">
-            ${place.features.map(f => `<span class="tag tag-success">✔ ${f}</span>`).join('')}
-          </div>
+          <a href="${place.mapUrl}" target="_blank" class="map-btn">عرض الموقع على الخريطة 📍</a>
         `;
-        listContainer.appendChild(card);
-
-        // إضافة علامة بالخريطة
-        const marker = L.marker([place.lat, place.lng]).addTo(map)
-          .bindPopup(`<b>${place.name}</b><br>${place.city} - ${place.category}`);
-        markers.push(marker);
+        grid.appendChild(card);
       });
     }
 
-    function filterCategory(cat) {
-      currentCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.includes(cat) || (cat === 'الكل' && btn.innerText.includes('جميع'))) {
-          btn.classList.add('active');
-        }
-      });
-      renderData();
-    }
-
-    function filterData() {
-      renderData();
-    }
-
-    window.onload = initMap;
+    // تشغيل العرض الابتدائي عند تحميل الصفحة
+    renderPlaces();
   </script>
 </body>
 </html>
