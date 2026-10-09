@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة معبر - طريق أسهل... الوصول إلى أيسر</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
+        .header { text-align: center; margin-bottom: 20px; }
+        #map { height: 600px; width: 100%; border-radius: 12px; }
+        .badge { display: inline-block; padding: 4px 8px; font-size: 12px; border-radius: 4px; margin: 2px; color: white; }
+        .bg-yes { background-color: #28a745; }
+        .bg-no { background-color: #dc3545; }
+        .map-btn { display: inline-block; margin-top: 10px; padding: 6px 12px; background-color: #0284c7; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>منصة معبر</h1>
+        <p>طريق أسهل... الوصول إلى أيسر</p>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="places.js"></script>
+    <script>
+        const map = L.map('map').setView([24.7136, 46.6753], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap | معبر'
+        }).addTo(map);
+
+        placesData.forEach(place => {
+            const elevator = place.accessibility.hasElevator 
+                ? '<span class="badge bg-yes">🛗 مصعد متوفر</span>' 
+                : '<span class="badge bg-no">🛗 لا يوجد مصعد</span>';
+
+            const parking = place.accessibility.hasParking 
+                ? '<span class="badge bg-yes">🅿️ موقف لذوي الإعاقة</span>' 
+                : '<span class="badge bg-no">🅿️ لا يوجد موقف مخصص</span>';
+
+            const restroom = place.accessibility.hasRestroom 
+                ? '<span class="badge bg-yes">♿ دورة مياه مجهزة</span>' 
+                : '<span class="badge bg-no">♿ لا توجد دورة مياه مجهزة</span>';
+
+            const popupContent = `
+                <div style="font-weight:bold; font-size:16px;">${place.name}</div>
+                <div style="color:gray; font-size:12px; margin-bottom:8px;">${place.city} - ${place.category}</div>
+                <div>${elevator}</div>
+                <div>${parking}</div>
+                <div>${restroom}</div>
+                <a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}" target="_blank">فتح في خرائط Google</a>
+            `;
+
+            L.marker([place.lat, place.lng]).addTo(map).bindPopup(popupContent);
+        });
+    </script>
+</body>
+</html>
