@@ -5,263 +5,332 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>دليل الأماكن والمدن</title>
+  <title>دليل الأماكن والخدمات</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #2563eb;
-      --bg: #f8fafc;
+      --primary: #3b82f6;
+      --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       --card-bg: #ffffff;
-      --text: #1e293b;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
       margin: 0;
-      padding: 20px;
+      padding: 40px 20px;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
-    h1 {
+    /* الهيدر والعنوان */
+    .header-section {
       text-align: center;
-      color: var(--primary);
+      margin-bottom: 35px;
     }
 
-    /* شريط التحكم: اختيار المدينة والتصفية */
-    .controls {
+    h1 {
+      font-size: 38px;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 0 0 10px 0;
+    }
+
+    .slogan {
+      font-size: 19px;
+      font-weight: 500;
+      color: #3b82f6;
+      margin: 0;
+    }
+
+    /* لوحة التحكم والخيارات */
+    .controls-panel {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      margin-bottom: 35px;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 20px;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
 
-    select, button {
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      font-size: 15px;
+    .city-select-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .city-select-wrapper label {
+      font-weight: 700;
+      font-size: 16px;
+      color: #334155;
+    }
+
+    select {
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 2px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      background-color: #ffffff;
       cursor: pointer;
-      background: white;
+      outline: none;
+      transition: all 0.2s ease;
     }
 
-    .filters {
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+
+    /* أزرار الفئات */
+    .filter-buttons {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
 
-    .filter-btn.active {
-      background-color: var(--primary);
-      color: white;
-      border-color: var(--primary);
+    .filter-btn {
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      color: #475569;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    /* شبكة عرض الأماكن */
+    .filter-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .filter-btn.active {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    /* شبكة الكروت */
     .places-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(226, 232, 240, 0.8);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform 0.2s;
+      transition: all 0.3s ease;
     }
 
     .card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     }
 
     .badge {
       display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 6px 14px;
+      border-radius: 30px;
       font-size: 12px;
-      font-weight: bold;
-      margin-bottom: 8px;
+      font-weight: 800;
+      margin-bottom: 14px;
       width: fit-content;
     }
 
-    .badge-univ { background-color: #dbeafe; color: #1e40af; }
-    .badge-rest { background-color: #fee2e2; color: #991b1b; }
-    .badge-cafe { background-color: #fef3c7; color: #92400e; }
+    /* ألوان شارات الفئات المريحة للعين */
+    .badge-univ { background: #dbeafe; color: #1e40af; }
+    .badge-rest { background: #ffe4e6; color: #9f1239; }
+    .badge-cafe { background: #fef3c7; color: #92400e; }
+    .badge-hosp { background: #dcfce7; color: #166534; }
+    .badge-gov  { background: #f3e8ff; color: #6b21a8; }
 
     .card h3 {
       margin: 0 0 8px 0;
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
     }
 
     .card p {
-      margin: 0 0 16px 0;
-      color: #64748b;
+      margin: 0 0 20px 0;
+      color: var(--text-sub);
       font-size: 14px;
+      line-height: 1.6;
     }
 
     .map-btn {
-      display: inline-block;
-      text-align: center;
-      background-color: var(--primary);
-      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #10b981;
+      color: #ffffff;
       text-decoration: none;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 500;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .map-btn:hover {
+      background: #059669;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
     }
 
     .no-results {
       text-align: center;
       grid-column: 1 / -1;
-      padding: 40px;
+      padding: 60px;
+      background: #ffffff;
+      border-radius: 20px;
       color: #94a3b8;
+      font-weight: 700;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>دليل الأماكن والمدن</h1>
+    <!-- العنوان والشعار -->
+    <div class="header-section">
+      <h1>دليل الأماكن والخدمات</h1>
+      <p class="slogan">طريق أسهل... وصول أيسر</p>
+    </div>
 
-    <!-- شريط الاختيار والتصفية -->
-    <div class="controls">
-      <div>
-        <label for="citySelect"><strong>اختر المدينة:</strong> </label>
+    <!-- لوحة التصفية والتحكم -->
+    <div class="controls-panel">
+      <div class="city-select-wrapper">
+        <label for="citySelect">المنطقة / المدينة:</label>
         <select id="citySelect" onchange="renderPlaces()">
           <option value="jeddah">جدة</option>
           <option value="riyadh">الرياض</option>
+          <option value="makkah">مكة المكرمة</option>
+          <option value="madinah">المدينة المنورة</option>
+          <option value="khobar">الخبر</option>
+          <option value="abha">أبها</option>
         </select>
       </div>
 
-      <div class="filters">
+      <div class="filter-buttons">
         <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
         <button class="filter-btn" onclick="setFilter('university', this)">جامعات</button>
         <button class="filter-btn" onclick="setFilter('restaurant', this)">مطاعم</button>
         <button class="filter-btn" onclick="setFilter('cafe', this)">كافيهات</button>
+        <button class="filter-btn" onclick="setFilter('hospital', this)">مستشفيات</button>
+        <button class="filter-btn" onclick="setFilter('gov', this)">دوائر حكومية</button>
       </div>
     </div>
 
-    <!-- كروت الأماكن -->
+    <!-- عرض الكروت -->
     <div id="placesGrid" class="places-grid"></div>
   </div>
 
   <script>
-    // قاعدة البيانات لجميع الأماكن حسب المدينة
     const data = {
+      // 1. جدة
       jeddah: [
-        // جامعات جدة
-        {
-          name: "جامعة الملك عبد العزيز",
-          type: "university",
-          categoryName: "جامعة",
-          desc: "حي السليمانية، جدة",
-          mapUrl: "https://maps.google.com/?q=King+Abdulaziz+University+Jeddah"
-        },
-        {
-          name: "جامعة جدة",
-          type: "university",
-          categoryName: "جامعة",
-          desc: "طريق عسفان، جدة",
-          mapUrl: "https://maps.google.com/?q=University+of+Jeddah"
-        },
-        {
-          name: "جامعة عفت",
-          type: "university",
-          categoryName: "جامعة",
-          desc: "حي النزلة اليمانية، جدة",
-          mapUrl: "https://maps.google.com/?q=Effat+University+Jeddah"
-        },
-        {
-          name: "جامعة دار الحكمة",
-          type: "university",
-          categoryName: "جامعة",
-          desc: "حي الفيحاء، جدة",
-          mapUrl: "https://maps.google.com/?q=Dar+Al-Hekma+University+Jeddah"
-        },
-
-        // مطاعم جدة
-        {
-          name: "مطعم البيك",
-          type: "restaurant",
-          categoryName: "مطعم",
-          desc: "فرع الخالدية، جدة",
-          mapUrl: "https://maps.google.com/?q=ALBAIK+Jeddah"
-        },
-        {
-          name: "مطعم خيال",
-          type: "restaurant",
-          categoryName: "مطعم",
-          desc: "طريق الأمير سلطان، جدة",
-          mapUrl: "https://maps.google.com/?q=Khayal+Restaurant+Jeddah"
-        },
-        {
-          name: "مطعم الشرقية للمأكولات البحرية",
-          type: "restaurant",
-          categoryName: "مطعم",
-          desc: "حي الحمراء، جدة",
-          mapUrl: "https://maps.google.com/?q=Al+Sharqia+Seafood+Jeddah"
-        },
-
-        // كافيهات جدة
-        {
-          name: "برو جراوندز (Brew92)",
-          type: "cafe",
-          categoryName: "كافيه",
-          desc: "شارع الخالدية، جدة",
-          mapUrl: "https://maps.google.com/?q=Brew92+Jeddah"
-        },
-        {
-          name: "برو كافيه (Boho Cafe)",
-          type: "cafe",
-          categoryName: "كافيه",
-          desc: "حي المحمدية، جدة",
-          mapUrl: "https://maps.google.com/?q=Boho+Cafe+Jeddah"
-        },
-        {
-          name: "مد كافيه (MEDd Coffee)",
-          type: "cafe",
-          categoryName: "كافيه",
-          desc: "حي الشاطئ، جدة",
-          mapUrl: "https://maps.google.com/?q=MEDd+Coffee+Jeddah"
-        }
+        { name: "جامعة الملك عبد العزيز", type: "university", categoryName: "جامعة", desc: "حي السليمانية - الفرع الرئيسي", mapUrl: "https://maps.google.com/?q=King+Abdulaziz+University+Jeddah" },
+        { name: "جامعة جدة", type: "university", categoryName: "جامعة", desc: "طريق عسفان - المقر الرئيسي", mapUrl: "https://maps.google.com/?q=University+of+Jeddah" },
+        { name: "جامعة عفت", type: "university", categoryName: "جامعة", desc: "حي النزلة اليمانية", mapUrl: "https://maps.google.com/?q=Effat+University+Jeddah" },
+        { name: "مطعم البيك", type: "restaurant", categoryName: "مطعم", desc: "فرع الخالدية - طريق الملك", mapUrl: "https://maps.google.com/?q=ALBAIK+Jeddah" },
+        { name: "مطعم خيال", type: "restaurant", categoryName: "مطعم", desc: "مشويات تركية - طريق الأمير سلطان", mapUrl: "https://maps.google.com/?q=Khayal+Restaurant+Jeddah" },
+        { name: "مطعم الوزان", type: "restaurant", categoryName: "مطعم", desc: "حي الخالدية - مأكولات لبنانية", mapUrl: "https://maps.google.com/?q=AlWazzan+Jeddah" },
+        { name: "برو جراوندز (Brew92)", type: "cafe", categoryName: "كافيه", desc: "قهوة مختصة - فرع الخالدية", mapUrl: "https://maps.google.com/?q=Brew92+Jeddah" },
+        { name: "بوهو كافيه (Boho Cafe)", type: "cafe", categoryName: "كافيه", desc: "حي المحمدية", mapUrl: "https://maps.google.com/?q=Boho+Cafe+Jeddah" },
+        { name: "مد كافيه (MEDd Coffee)", type: "cafe", categoryName: "كافيه", desc: "الكورنيش الشمالي", mapUrl: "https://maps.google.com/?q=MEDd+Coffee+Jeddah" },
+        { name: "مستشفى التخصصي", type: "hospital", categoryName: "مستشفى", desc: "مستشفى الملك فيصل التخصصي - حي الروضة", mapUrl: "https://maps.google.com/?q=King+Faisal+Specialist+Hospital+Jeddah" },
+        { name: "مستشفى أطباء الدولة", type: "hospital", categoryName: "مستشفى", desc: "شارع فلسطين", mapUrl: "https://maps.google.com/?q=Doctor+Hospital+Jeddah" },
+        { name: "أمانة محافظة جدة", type: "gov", categoryName: "دائرة حكومية", desc: "حي الأندلس - المقر الرئيسي", mapUrl: "https://maps.google.com/?q=Jeddah+Municipality" },
+        { name: "جوازات محافظة جدة", type: "gov", categoryName: "دائرة حكومية", desc: "حي الرحاب", mapUrl: "https://maps.google.com/?q=Jeddah+Passport+Office" }
       ],
+
+      // 2. الرياض
       riyadh: [
-        {
-          name: "جامعة الملك سعود",
-          type: "university",
-          categoryName: "جامعة",
-          desc: "الدرعية، الرياض",
-          mapUrl: "https://maps.google.com/?q=King+Saud+University+Riyadh"
-        },
-        {
-          name: "مطعم القرية النجديّة",
-          type: "restaurant",
-          categoryName: "مطعم",
-          desc: "حي العليا، الرياض",
-          mapUrl: "https://maps.google.com/?q=Najd+Village+Riyadh"
-        },
-        {
-          name: "إل كافين كافيه (Elixir Bunn)",
-          type: "cafe",
-          categoryName: "كافيه",
-          desc: "حي النخيل، الرياض",
-          mapUrl: "https://maps.google.com/?q=Elixir+Bunn+Riyadh"
-        }
+        { name: "جامعة الملك سعود", type: "university", categoryName: "جامعة", desc: "الدرعية - المقر الرئيسي", mapUrl: "https://maps.google.com/?q=King+Saud+University+Riyadh" },
+        { name: "جامعة الأميرة نورة", type: "university", categoryName: "جامعة", desc: "طريق المطار", mapUrl: "https://maps.google.com/?q=PNU+Riyadh" },
+        { name: "مطعم القرية النجديّة", type: "restaurant", categoryName: "مطعم", desc: "حي العليا", mapUrl: "https://maps.google.com/?q=Najd+Village+Riyadh" },
+        { name: "مطعم سهيل", type: "restaurant", categoryName: "مطعم", desc: "مأكولات سعودية معاصرة - حي النخيل", mapUrl: "https://maps.google.com/?q=Suhail+Restaurant+Riyadh" },
+        { name: "إلكسير بَن (Elixir Bunn)", type: "cafe", categoryName: "كافيه", desc: "حي النخيل", mapUrl: "https://maps.google.com/?q=Elixir+Bunn+Riyadh" },
+        { name: "خطوة جمل (Camel Step)", type: "cafe", categoryName: "كافيه", desc: "حي التعاون", mapUrl: "https://maps.google.com/?q=Camel+Step+Riyadh" },
+        { name: "مدينة الملك فهد الطبية", type: "hospital", categoryName: "مستشفى", desc: "طريق مكة المكرمة - السليمانية", mapUrl: "https://maps.google.com/?q=King+Fahad+Medical+City+Riyadh" },
+        { name: "مستشفى الحبيب", type: "hospital", categoryName: "مستشفى", desc: "فرع العليا", mapUrl: "https://maps.google.com/?q=Habib+Hospital+Olaya+Riyadh" },
+        { name: "وزارة الداخلية", type: "gov", categoryName: "دائرة حكومية", desc: "طريق الملك فهد", mapUrl: "https://maps.google.com/?q=Ministry+of+Interior+Riyadh" },
+        { name: "أمانة منطقة الرياض", type: "gov", categoryName: "دائرة حكومية", desc: "حي الديرة", mapUrl: "https://maps.google.com/?q=Riyadh+Municipality" }
+      ],
+
+      // 3. مكة المكرمة
+      makkah: [
+        { name: "جامعة أم القرى", type: "university", categoryName: "جامعة", desc: "العابدية - المقر الرئيسي", mapUrl: "https://maps.google.com/?q=Umm+Al-Qura+University+Makkah" },
+        { name: "مطعم البيك", type: "restaurant", categoryName: "مطعم", desc: "فرع العزيزية", mapUrl: "https://maps.google.com/?q=ALBAIK+Makkah" },
+        { name: "مطعم أفندم", type: "restaurant", categoryName: "مطعم", desc: "حي الضيافة", mapUrl: "https://maps.google.com/?q=Afandim+Makkah" },
+        { name: "كافيه درافت (Draft Cafe)", type: "cafe", categoryName: "كافيه", desc: "حي العوالق", mapUrl: "https://maps.google.com/?q=Draft+Cafe+Makkah" },
+        { name: "مدينة الملك عبد الله الطبية", type: "hospital", categoryName: "مستشفى", desc: "حي العوالي", mapUrl: "https://maps.google.com/?q=King+Abdullah+Medical+City+Makkah" },
+        { name: "إمارة منطقة مكة المكرمة", type: "gov", categoryName: "دائرة حكومية", desc: "حي ديوان الإمارة", mapUrl: "https://maps.google.com/?q=Makkah+Emirate" }
+      ],
+
+      // 4. المدينة المنورة
+      madinah: [
+        { name: "الجامعة الإسلامية", type: "university", categoryName: "جامعة", desc: "طريق الجامعات", mapUrl: "https://maps.google.com/?q=Islamic+University+Madinah" },
+        { name: "جامعة طيبة", type: "university", categoryName: "جامعة", desc: "طريق خالد بن الوليد", mapUrl: "https://maps.google.com/?q=Taibah+University+Madinah" },
+        { name: "مطعم حيدر أباد", type: "restaurant", categoryName: "مطعم", desc: "حي سلطانة", mapUrl: "https://maps.google.com/?q=Hyderabad+Restaurant+Madinah" },
+        { name: "أوفر دوز كافيه", type: "cafe", categoryName: "كافيه", desc: "طريق سلطانة", mapUrl: "https://maps.google.com/?q=Overdose+Madinah" },
+        { name: "مستشفى الملك فهد", type: "hospital", categoryName: "مستشفى", desc: "طريق خالد بن الوليد", mapUrl: "https://maps.google.com/?q=King+Fahad+Hospital+Madinah" },
+        { name: "أمانة منطقة المدينة المنورة", type: "gov", categoryName: "دائرة حكومية", desc: "حي العنبرية", mapUrl: "https://maps.google.com/?q=Madinah+Municipality" }
+      ],
+
+      // 5. الخبر
+      khobar: [
+        { name: "جامعة الإمام عبد الرحمن بن فيصل", type: "university", categoryName: "جامعة", desc: "طريق الراكة", mapUrl: "https://maps.google.com/?q=IAU+Khobar" },
+        { name: "مطعم السنبوك", type: "restaurant", categoryName: "مطعم", desc: "مأكولات بحرية - الواجهة البحرية", mapUrl: "https://maps.google.com/?q=Al+Sanbook+Khobar" },
+        { name: "باتيسير كافيه", type: "cafe", categoryName: "كافيه", desc: "حي الحزام الذهبي", mapUrl: "https://maps.google.com/?q=Patisserie+Khobar" },
+        { name: "مستشفى المانع العام", type: "hospital", categoryName: "مستشفى", desc: "شارع الخبر", mapUrl: "https://maps.google.com/?q=AlMana+Hospital+Khobar" },
+        { name: "بلدية محافظة الخبر", type: "gov", categoryName: "دائرة حكومية", desc: "حي العقربية", mapUrl: "https://maps.google.com/?q=Khobar+Municipality" }
+      ],
+
+      // 6. أبها
+      abha: [
+        { name: "جامعة الملك خالد", type: "university", categoryName: "جامعة", desc: "طريق الفرعاء", mapUrl: "https://maps.google.com/?q=King+Khalid+University+Abha" },
+        { name: "مطعم العرين", type: "restaurant", categoryName: "مطعم", desc: "مأكولات شعبية - طريق الملك فهد", mapUrl: "https://maps.google.com/?q=AlAreen+Abha" },
+        { name: "لافندر كافيه", type: "cafe", categoryName: "كافيه", desc: "شارع الفن", mapUrl: "https://maps.google.com/?q=Lavender+Cafe+Abha" },
+        { name: "مستشفى عسير المركزي", type: "hospital", categoryName: "مستشفى", desc: "حي الربوة", mapUrl: "https://maps.google.com/?q=Asir+Central+Hospital+Abha" },
+        { name: "أمانة منطقة عسير", type: "gov", categoryName: "دائرة حكومية", desc: "وسط المدينة", mapUrl: "https://maps.google.com/?q=Asir+Municipality" }
       ]
     };
 
@@ -285,7 +354,7 @@
         : places.filter(p => p.type === currentFilter);
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<div class="no-results">لا توجد أماكن مطابقة للبحث حالياً.</div>';
+        grid.innerHTML = '<div class="no-results">لا توجد أماكن متوفرة في هذه الفئة حالياً بهذه المدينة.</div>';
         return;
       }
 
@@ -293,6 +362,8 @@
         let badgeClass = 'badge-univ';
         if (place.type === 'restaurant') badgeClass = 'badge-rest';
         if (place.type === 'cafe') badgeClass = 'badge-cafe';
+        if (place.type === 'hospital') badgeClass = 'badge-hosp';
+        if (place.type === 'gov') badgeClass = 'badge-gov';
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -302,13 +373,15 @@
             <h3>${place.name}</h3>
             <p>${place.desc}</p>
           </div>
-          <a href="${place.mapUrl}" target="_blank" class="map-btn">عرض الموقع على الخريطة 📍</a>
+          <a href="${place.mapUrl}" target="_blank" class="map-btn">
+            <span>الانتقال للموقع</span> 📍
+          </a>
         `;
         grid.appendChild(card);
       });
     }
 
-    // تشغيل العرض الابتدائي عند تحميل الصفحة
+    // التشغيل التلقائي عند التحميل
     renderPlaces();
   </script>
 </body>
