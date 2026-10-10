@@ -36,26 +36,37 @@
             padding-bottom: 60px;
         }
 
+        /* الترويسة الزرقاء المتدرجة المطابقة للصورة */
         header {
-            background-color: #ffffff;
-            padding: 18px 20px;
+            background: linear-gradient(135deg, #1a73e8 0%, #0d9488 100%);
+            padding: 25px 20px 35px 20px;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
+        .badge-top {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            margin-bottom: 8px;
+        }
+
         header h1 {
-            color: #1a73e8;
-            font-size: 1.6rem;
+            color: #ffffff;
+            font-size: 1.8rem;
             font-weight: 800;
         }
 
         header p {
-            color: var(--text-sub);
-            font-size: 0.85rem;
-            margin-top: 2px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            margin-top: 4px;
         }
 
         .controls {
@@ -64,16 +75,17 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 13px 16px;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
             font-size: 0.95rem;
             outline: none;
+            background: #ffffff;
         }
 
         .filter-pills {
@@ -81,6 +93,11 @@
             gap: 8px;
             overflow-x: auto;
             padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .filter-pills::-webkit-scrollbar {
+            display: none;
         }
 
         .pill {
@@ -90,7 +107,7 @@
             border: 1px solid #e2e8f0;
             color: var(--text-sub);
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             white-space: nowrap;
             cursor: pointer;
         }
@@ -107,6 +124,7 @@
             max-width: 600px;
             margin: 0 auto 15px auto;
             border-radius: 16px;
+            border: 1px solid #e2e8f0;
         }
 
         .locations-container {
@@ -207,16 +225,17 @@
 <body>
 
     <header>
+        <div class="badge-top">دليل التسهيلات لذوي الهمم</div>
         <h1>منصة مَعْبَر</h1>
         <p>طريق أسهل... وصول أيسر</p>
     </header>
 
     <div class="controls">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ابحث عن مستشفى، جامعة، مول..." oninput="renderLocations()">
+            <input type="text" id="searchInput" placeholder="ابحث باسم المكان، المدينة، أو التصنيف..." oninput="renderLocations()">
         </div>
         <div class="filter-pills">
-            <button class="pill active" onclick="filterCity('الكل', this)">الكل</button>
+            <button class="pill active" onclick="filterCity('الكل', this)">جميع الأماكن</button>
             <button class="pill" onclick="filterCity('جدة', this)">جدة</button>
             <button class="pill" onclick="filterCity('الرياض', this)">الرياض</button>
             <button class="pill" onclick="filterCity('مكة', this)">مكة</button>
@@ -295,7 +314,7 @@
             // الخبر
             { name: "مستشفى المانع - الخبر", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2812, lng: 50.2083, query: "Al+Mana+General+Hospital+Khobar" },
             { name: "مستشفى الدكتور سليمان الحبيب - الخبر", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2900, lng: 50.2100, query: "Dr.+Sulaiman+Al+Habib+Khobar" },
-            { name: "مستشفى الملك فهد الجامعي", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2750, lng: 50.2000, code: "King+Fahd+University+Hospital+Khobar" },
+            { name: "مستشفى الملك فهد الجامعي", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2750, lng: 50.2000, query: "King+Fahd+University+Hospital+Khobar" },
             { name: "جامعة الإمام عبدالرحمن بن فيصل", city: "الخبر", category: "جامعات", icon: "🎓", lat: 26.3900, lng: 50.1900, query: "Imam+Abdulrahman+Bin+Faisal+University" },
             { name: "الراشد مول - الخبر", city: "الخبر", category: "مراكز تجارية", icon: "🛍️", lat: 26.2847, lng: 50.2064, query: "Al+Rashid+Mall+Khobar" },
             { name: "الظهران مول", city: "الخبر", category: "مراكز تجارية", icon: "🛍️", lat: 26.3150, lng: 50.1420, query: "Dhahran+Mall" },
@@ -316,8 +335,8 @@
             { name: "كافيه حروف - أبها", city: "أبها", category: "كافيهات", icon: "☕", lat: 18.2320, lng: 42.5180, query: "Huroof+Cafe+Abha" },
             { name: "أمانة منطقة عسير", city: "أبها", category: "دوائر حكومية", icon: "🏛️", lat: 18.2150, lng: 42.5000, query: "Aseer+Region+Municipality" },
 
-            // القصيم
-            { name: "مستشفى الملك فهد التخصصي ببيدة", city: "القصيم", category: "مستشفيات", icon: "🏥", lat: 26.3300, lng: 43.9700, query: "King+Fahd+Specialist+Hospital+Buraidah" },
+            // القصيم (تصحيح إملائي بريدة)
+            { name: "مستشفى الملك فهد التخصصي ببريدة", city: "القصيم", category: "مستشفيات", icon: "🏥", lat: 26.3300, lng: 43.9700, query: "King+Fahd+Specialist+Hospital+Buraidah" },
             { name: "مستشفى بريدة المركزي", city: "القصيم", category: "مستشفيات", icon: "🏥", lat: 26.3200, lng: 43.9600, query: "Buraidah+Central+Hospital" },
             { name: "جامعة القصيم", city: "القصيم", category: "جامعات", icon: "🎓", lat: 26.3500, lng: 43.7600, query: "Qassim+University" },
             { name: "النخيل بلازا - بريدة", city: "القصيم", category: "مراكز تجارية", icon: "🛍️", lat: 26.3250, lng: 43.9750, query: "Al+Nakheel+Plaza+Buraidah" },
