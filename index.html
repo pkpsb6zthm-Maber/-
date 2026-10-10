@@ -1,423 +1,421 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة مَعْبَر - طريق أسهل... وصول أيسر</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        :root {
-            --primary-bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --tag-green-bg: #e6f4ea;
-            --tag-green-text: #137333;
-            --tag-blue-bg: #e8f0fe;
-            --tag-blue-text: #1a73e8;
-            --btn-maps-bg: #e8f0fe;
-            --btn-maps-text: #1a73e8;
-            --border-color: #f1f5f9;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مَعْبَر | طريق أسهل… وصول أيسر</title>
+  
+  <!-- Leaflet CSS الخرائط -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', sans-serif;
-        }
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #0b5ed7;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #212529;
+    }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: 60px;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
 
-        /* الترويسة الزرقاء المتدرجة المطابقة للصورة */
-        header {
-            background: linear-gradient(135deg, #1a73e8 0%, #0d9488 100%);
-            padding: 25px 20px 35px 20px;
-            text-align: center;
-            color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-        .badge-top {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            margin-bottom: 8px;
-        }
+    /* الهيدر */
+    header {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
-        header h1 {
-            color: #ffffff;
-            font-size: 1.8rem;
-            font-weight: 800;
-        }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
 
-        header p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.9rem;
-            margin-top: 4px;
-        }
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
 
-        .controls {
-            padding: 15px 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    /* أدوات التحكم والفلترة */
+    .controls-container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      width: 100%;
+    }
 
-        .search-box input {
-            width: 100%;
-            padding: 13px 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.95rem;
-            outline: none;
-            background: #ffffff;
-        }
+    .controls-container input,
+    .controls-container select {
+      padding: 12px 15px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+      width: 100%;
+    }
 
-        .filter-pills {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-            scrollbar-width: none;
-        }
+    .controls-container input:focus,
+    .controls-container select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    }
 
-        .filter-pills::-webkit-scrollbar {
-            display: none;
-        }
+    /* تقسيم الشاشة: خريطة + قائمة */
+    .main-content {
+      max-width: 1100px;
+      margin: 0 auto 30px auto;
+      padding: 0 15px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+      flex: 1;
+    }
 
-        .pill {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: var(--text-sub);
-            font-size: 0.85rem;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-        }
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
 
-        .pill.active {
-            background: #1a73e8;
-            color: #ffffff;
-            border-color: #1a73e8;
-        }
+    /* الخريطة */
+    #map {
+      height: 500px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1;
+    }
 
-        #map {
-            height: 220px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto 15px auto;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-        }
+    /* قائمة الأماكن */
+    .places-list {
+      height: 500px;
+      overflow-y: auto;
+      padding-left: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-        .locations-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    .place-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-right: 5px solid var(--primary-color);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-        .location-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 18px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
+    .place-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
 
-        .card-header {
-            width: 100%;
-            margin-bottom: 8px;
-        }
+    .place-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e3c72;
+      margin-bottom: 6px;
+    }
 
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .place-info {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-bottom: 12px;
+    }
 
-        .card-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-top: 3px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+    .features-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
 
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 12px 0 16px 0;
-            width: 100%;
-        }
+    .badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
 
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
+    .badge-available {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
 
-        .tag-green {
-            background-color: var(--tag-green-bg);
-            color: var(--tag-green-text);
-        }
+    .badge-unavailable {
+      background-color: #f8d7da;
+      color: #842029;
+    }
 
-        .tag-blue {
-            background-color: var(--tag-blue-bg);
-            color: var(--tag-blue-text);
-        }
+    .map-btn {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: background 0.2s;
+      text-align: center;
+    }
 
-        .maps-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            background-color: var(--btn-maps-bg);
-            color: var(--btn-maps-text);
-            font-weight: 700;
-            font-size: 0.9rem;
-            border-radius: 10px;
-            text-decoration: none;
-            width: 100%;
-            text-align: center;
-        }
+    .map-btn:hover {
+      background-color: var(--secondary-color);
+    }
 
-        footer {
-            text-align: center;
-            padding: 25px 15px;
-            margin-top: 30px;
-            color: var(--text-sub);
-            font-size: 0.8rem;
-        }
-    </style>
+    footer {
+      background-color: #111827;
+      color: #9ca3af;
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9rem;
+      margin-top: auto;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="badge-top">دليل التسهيلات لذوي الهمم</div>
-        <h1>منصة مَعْبَر</h1>
-        <p>طريق أسهل... وصول أيسر</p>
-    </header>
+  <!-- شريط العنوان -->
+  <header>
+    <h1>مَعْبَر</h1>
+    <p>طريق أسهل… وصول أيسر</p>
+  </header>
 
-    <div class="controls">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ابحث باسم المكان، المدينة، أو التصنيف..." oninput="renderLocations()">
-        </div>
-        <div class="filter-pills">
-            <button class="pill active" onclick="filterCity('الكل', this)">جميع الأماكن</button>
-            <button class="pill" onclick="filterCity('جدة', this)">جدة</button>
-            <button class="pill" onclick="filterCity('الرياض', this)">الرياض</button>
-            <button class="pill" onclick="filterCity('مكة', this)">مكة</button>
-            <button class="pill" onclick="filterCity('المدينة', this)">المدينة</button>
-            <button class="pill" onclick="filterCity('الخبر', this)">الخبر</button>
-            <button class="pill" onclick="filterCity('أبها', this)">أبها</button>
-            <button class="pill" onclick="filterCity('القصيم', this)">القصيم</button>
-            <button class="pill" onclick="filterCity('حائل', this)">حائل</button>
-        </div>
-    </div>
+  <!-- أدوات التصفية والبحث -->
+  <div class="controls-container">
+    <input type="text" id="searchInput" placeholder="🔍 ابحث عن موقع أو كلية..." oninput="filterPlaces()">
+    
+    <select id="citySelect" onchange="filterPlaces()">
+      <option value="">جميع المدن</option>
+      <option value="جدة">جدة</option>
+      <option value="الرياض">الرياض</option>
+      <option value="مكة">مكة</option>
+    </select>
 
+    <select id="categorySelect" onchange="filterPlaces()">
+      <option value="">جميع الفئات</option>
+      <option value="جامعات">جامعات</option>
+      <option value="تعليم">تعليم</option>
+      <option value="مستشفيات">مستشفيات</option>
+      <option value="قطاع حكومي">قطاع حكومي</option>
+      <option value="مطاعم">مطاعم</option>
+      <option value="كافيهات">كافيهات</option>
+    </select>
+  </div>
+
+  <!-- الشاشة الرئيسية: الخريطة + القائمة -->
+  <div class="main-content">
     <div id="map"></div>
+    <div class="places-list" id="placesContainer"></div>
+  </div>
 
-    <div class="locations-container" id="locationsList"></div>
+  <!-- الفوتر -->
+  <footer>
+    منصة مَعْبَر &copy; 2026 - جميع الحقوق محفوظة
+  </footer>
 
-    <footer>
-        <p>تنبيه: ظهور المكان في منصة معبر لا يعني أن جميع تسهيلات الوصول فيه قد تم التحقق منها.</p>
-        <p style="margin-top: 5px;">منصة معبر © 2026 – طريق أسهل، وصول أيسر</p>
-    </footer>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        const places = [
-            // جدة
-            { name: "كلية جدة العالمية", city: "جدة", category: "جامعات", icon: "🎓", lat: 21.5433, lng: 39.1728, query: "Jeddah+International+College" },
-            { name: "كلية الاتصالات والإلكترونيات بجدة", city: "جدة", category: "جامعات", icon: "🎓", lat: 21.4889, lng: 39.2311, query: "College+of+Telecom+and+Electronics+Jeddah" },
-            { name: "رد سي مول", city: "جدة", category: "مراكز تجارية", icon: "🛍️", lat: 21.6262, lng: 39.1114, query: "Red+Sea+Mall+Jeddah" },
-            { name: "الأندلس مول", city: "جدة", category: "مراكز تجارية", icon: "🛍️", lat: 21.5072, lng: 39.2014, query: "Al+Andalus+Mall+Jeddah" },
-            { name: "مول العرب", city: "جدة", category: "مراكز تجارية", icon: "🛍️", lat: 21.6322, lng: 39.1564, query: "Mall+of+Arabia+Jeddah" },
-            { name: "المركز الطبي الدولي", city: "جدة", category: "مستشفيات", icon: "🏥", lat: 21.5161, lng: 39.1758, query: "International+Medical+Center+Jeddah" },
-            { name: "مستشفى الملك عبدالعزيز", city: "جدة", category: "مستشفيات", icon: "🏥", lat: 21.4682, lng: 39.2154, query: "King+Abdulaziz+Hospital+Jeddah" },
-            { name: "مستشفى شرق جدة", city: "جدة", category: "مستشفيات", icon: "🏥", lat: 21.5283, lng: 39.2891, query: "East+Jeddah+Hospital" },
-            { name: "مستشفى جامعة الملك عبدالعزيز", city: "جدة", category: "مستشفيات", icon: "🏥", lat: 21.4939, lng: 39.2431, query: "King+Abdulaziz+University+Hospital" },
-            { name: "جامعة عفت", city: "جدة", category: "جامعات", icon: "🎓", lat: 21.4812, lng: 39.2065, query: "Effat+University+Jeddah" },
-            { name: "السلام مول", city: "جدة", category: "مراكز تجارية", icon: "🛍️", lat: 21.5036, lng: 39.2189, query: "Al+Salam+Mall+Jeddah" },
-            { name: "جدة بارك", city: "جدة", category: "مراكز تجارية", icon: "🛍️", lat: 21.5644, lng: 39.1481, query: "Jeddah+Park" },
-            { name: "مطعم هرفي", city: "جدة", category: "مطاعم", icon: "🍽️", lat: 21.5422, lng: 39.1722, query: "Herfy+Jeddah" },
-            { name: "مطعم البيك - جدة", city: "جدة", category: "مطاعم", icon: "🍽️", lat: 21.5381, lng: 39.1689, query: "ALBAIK+Jeddah" },
-            { name: "ستارباكس - جدة", city: "جدة", category: "كافيهات", icon: "☕", lat: 21.5511, lng: 39.1402, query: "Starbucks+Jeddah" },
-            { name: "دانكن - جدة", city: "جدة", category: "كافيهات", icon: "☕", lat: 21.5410, lng: 39.1550, query: "Dunkin+Jeddah" },
+  <script>
+    // --- 1. مصفوفة البيانات الشاملة (مع الأماكن القديمة والتعديلات الجديدة) ---
+    const placesData = [
+      // ✏️ [تعديل] كلية الاتصالات - (مصعد ومواقف غير متوفرة)
+      {
+        id: 1,
+        name: "كلية الاتصالات والمعلومات",
+        city: "جدة",
+        category: "تعليم",
+        elevator: false,
+        parking: false,
+        restroom: true,
+        lat: 21.4880,
+        lng: 39.2431,
+        mapUrl: "https://maps.google.com/?q=21.4880,39.2431"
+      },
+      // ➕ [إضافة جديدة] جامعة الملك عبدالعزيز - (متوفر كل شيء)
+      {
+        id: 2,
+        name: "جامعة الملك عبدالعزيز",
+        city: "جدة",
+        category: "جامعات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 21.4883,
+        lng: 39.2452,
+        mapUrl: "https://maps.google.com/?q=King+Abdulaziz+University+Jeddah"
+      },
+      // 📌 المواقع القديمة كاملة بدون حذف
+      {
+        id: 3,
+        name: "جامعة جدة",
+        city: "جدة",
+        category: "جامعات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 21.9056,
+        lng: 39.0945,
+        mapUrl: "https://maps.google.com/?q=University+of+Jeddah"
+      },
+      {
+        id: 4,
+        name: "مستشفى الملك فهد",
+        city: "جدة",
+        category: "مستشفيات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 21.5165,
+        lng: 39.1728,
+        mapUrl: "https://maps.google.com/?q=King+Fahd+Hospital+Jeddah"
+      },
+      {
+        id: 5,
+        name: "مستشفى الحسيني",
+        city: "جدة",
+        category: "مستشفيات",
+        elevator: true,
+        parking: false,
+        restroom: true,
+        lat: 21.5433,
+        lng: 39.1722,
+        mapUrl: "https://maps.google.com/?q=21.5433,39.1722"
+      },
+      {
+        id: 6,
+        name: "مجمع اليمامة الحكومي",
+        city: "الرياض",
+        category: "قطاع حكومي",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 24.7136,
+        lng: 46.6753,
+        mapUrl: "https://maps.google.com/?q=24.7136,46.6753"
+      },
+      {
+        id: 7,
+        name: "مطعم البرج",
+        city: "جدة",
+        category: "مطاعم",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 21.5855,
+        lng: 39.1411,
+        mapUrl: "https://maps.google.com/?q=21.5855,39.1411"
+      },
+      {
+        id: 8,
+        name: "كافيه المساء",
+        city: "جدة",
+        category: "كافيهات",
+        elevator: false,
+        parking: true,
+        restroom: true,
+        lat: 21.5622,
+        lng: 39.1589,
+        mapUrl: "https://maps.google.com/?q=21.5622,39.1589"
+      }
+    ];
 
-            // الرياض
-            { name: "مستشفى دله", city: "الرياض", category: "مستشفيات", icon: "🏥", lat: 24.7331, lng: 46.6621, query: "Dallah+Hospital+Riyadh" },
-            { name: "مستشفى الدكتور سليمان الحبيب - التخصصي", city: "الرياض", category: "مستشفيات", icon: "🏥", lat: 24.6853, lng: 46.6692, query: "Dr.+Sulaiman+Al+Habib+Hospital+Takhassusi" },
-            { name: "جامعة الأميرة نورة بنت عبدالرحمن", city: "الرياض", category: "جامعات", icon: "🎓", lat: 24.8472, lng: 46.7241, query: "Princess+Nourah+Bint+Abdulrahman+University" },
-            { name: "جامعة الإمام محمد بن سعود الإسلامية", city: "الرياض", category: "جامعات", icon: "🎓", lat: 24.8139, lng: 46.7022, query: "Imam+Mohammad+Ibn+Saud+Islamic+University" },
-            { name: "الرياض بارك", city: "الرياض", category: "مراكز تجارية", icon: "🛍️", lat: 24.7561, lng: 46.6306, query: "Riyadh+Park" },
-            { name: "النخيل مول - الرياض", city: "الرياض", category: "مراكز تجارية", icon: "🛍️", lat: 24.7675, lng: 46.7153, query: "Nakheel+Mall+Riyadh" },
-            { name: "واجهة الرياض", city: "الرياض", category: "مراكز تجارية", icon: "🛍️", lat: 24.8286, lng: 46.7303, query: "Riyadh+Front" },
-            { name: "مطعم البيك - الرياض", city: "الرياض", category: "مطاعم", icon: "🍽️", lat: 24.7136, lng: 46.6753, query: "ALBAIK+Riyadh" },
-            { name: "مطعم هرفي - الرياض", city: "الرياض", category: "مطاعم", icon: "🍽️", lat: 24.7210, lng: 46.6500, query: "Herfy+Riyadh" },
-            { name: "ستارباكس - الرياض", city: "الرياض", category: "كافيهات", icon: "☕", lat: 24.7000, lng: 46.6800, query: "Starbucks+Riyadh" },
-            { name: "وزارة الموارد البشرية والتنمية الاجتماعية", city: "الرياض", category: "دوائر حكومية", icon: "🏛️", lat: 24.6601, lng: 46.7055, query: "Ministry+of+Human+Resources+Riyadh" },
+    // --- 2. تهيئة الخريطة ---
+    const map = L.map('map').setView([21.4883, 39.2452], 12);
+    
+    // إضافية طبقة الخريطة (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-            // مكة
-            { name: "مستشفى النور التخصصي", city: "مكة", category: "مستشفيات", icon: "🏥", lat: 21.3822, lng: 39.8511, query: "Al+Noor+Specialist+Hospital+Makkah" },
-            { name: "مستشفى الملك عبدالعزيز بمكة", city: "مكة", category: "مستشفيات", icon: "🏥", lat: 21.4310, lng: 39.8150, query: "King+Abdulaziz+Hospital+Makkah" },
-            { name: "مستشفى حراء العام", city: "مكة", category: "مستشفيات", icon: "🏥", lat: 21.4650, lng: 39.8400, query: "Hera+General+Hospital+Makkah" },
-            { name: "جامعة أم القرى", city: "مكة", category: "جامعات", icon: "🎓", lat: 21.3283, lng: 39.9511, query: "Umm+Al-Qura+University" },
-            { name: "مكة مول", city: "مكة", category: "مراكز تجارية", icon: "🛍️", lat: 21.3883, lng: 39.8833, query: "Makkah+Mall" },
-            { name: "الضيافة مول", city: "مكة", category: "مراكز تجارية", icon: "🛍️", lat: 21.4388, lng: 39.8105, query: "Al+Diyafa+Mall+Makkah" },
-            { name: "مطعم البيك - مكة", city: "مكة", category: "مطاعم", icon: "🍽️", lat: 21.4225, lng: 39.8261, query: "ALBAIK+Makkah" },
-            { name: "مطعم الطازج - مكة", city: "مكة", category: "مطاعم", icon: "🍽️", lat: 21.4180, lng: 39.8210, query: "Al+Tazaj+Makkah" },
-            { name: "ستارباكس - مكة", city: "مكة", category: "كافيهات", icon: "☕", lat: 21.4200, lng: 39.8300, query: "Starbucks+Makkah" },
-            { name: "أمانة العاصمة المقدسة", city: "مكة", category: "دوائر حكومية", icon: "🏛️", lat: 21.4111, lng: 39.8522, query: "Holy+Makkah+Municipality" },
+    let markers = [];
 
-            // المدينة المنورة
-            { name: "الراشد ميغا مول", city: "المدينة", category: "مراكز تجارية", icon: "🛍️", lat: 24.4752, lng: 39.6521, query: "Al+Rashid+Mega+Mall+Madinah" },
-            { name: "النور مول", city: "المدينة", category: "مراكز تجارية", icon: "🛍️", lat: 24.4925, lng: 39.6011, query: "Al+Noor+Mall+Madinah" },
-            { name: "مطعم البيك - المدينة", city: "المدينة", category: "مطاعم", icon: "🍽️", lat: 24.4672, lng: 39.6111, query: "ALBAIK+Madinah" },
-            { name: "مطعم الرومانسية - المدينة", city: "المدينة", category: "مطاعم", icon: "🍽️", lat: 24.4550, lng: 39.6200, query: "Al+Romainsiah+Madinah" },
-            { name: "ستارباكس - المدينة", city: "المدينة", category: "كافيهات", icon: "☕", lat: 24.4680, lng: 39.6050, query: "Starbucks+Madinah" },
-            { name: "أمانة منطقة المدينة المنورة", city: "المدينة", category: "دوائر حكومية", icon: "🏛️", lat: 24.4700, lng: 39.6100, query: "Madinah+Municipality" },
+    // --- 3. دالة عرض الأماكن والخريطة ---
+    function renderPlaces(data) {
+      const container = document.getElementById('placesContainer');
+      container.innerHTML = '';
 
-            // الخبر
-            { name: "مستشفى المانع - الخبر", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2812, lng: 50.2083, query: "Al+Mana+General+Hospital+Khobar" },
-            { name: "مستشفى الدكتور سليمان الحبيب - الخبر", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2900, lng: 50.2100, query: "Dr.+Sulaiman+Al+Habib+Khobar" },
-            { name: "مستشفى الملك فهد الجامعي", city: "الخبر", category: "مستشفيات", icon: "🏥", lat: 26.2750, lng: 50.2000, query: "King+Fahd+University+Hospital+Khobar" },
-            { name: "جامعة الإمام عبدالرحمن بن فيصل", city: "الخبر", category: "جامعات", icon: "🎓", lat: 26.3900, lng: 50.1900, query: "Imam+Abdulrahman+Bin+Faisal+University" },
-            { name: "الراشد مول - الخبر", city: "الخبر", category: "مراكز تجارية", icon: "🛍️", lat: 26.2847, lng: 50.2064, query: "Al+Rashid+Mall+Khobar" },
-            { name: "الظهران مول", city: "الخبر", category: "مراكز تجارية", icon: "🛍️", lat: 26.3150, lng: 50.1420, query: "Dhahran+Mall" },
-            { name: "مطعم البيك - الخبر", city: "الخبر", category: "مطاعم", icon: "🍽️", lat: 26.2800, lng: 50.2000, query: "ALBAIK+Khobar" },
-            { name: "مطعم شاورمر - الخبر", city: "الخبر", category: "مطاعم", icon: "🍽️", lat: 26.2850, lng: 50.2050, query: "Shawarmar+Khobar" },
-            { name: "ستارباكس - الخبر", city: "الخبر", category: "كافيهات", icon: "☕", lat: 26.2820, lng: 50.2080, query: "Starbucks+Khobar" },
-            { name: "أمانة المنطقة الشرقية", city: "الخبر", category: "دوائر حكومية", icon: "🏛️", lat: 26.2900, lng: 50.2200, query: "Eastern+Province+Municipality" },
+      // مسح الدبابيس القديمة من الخريطة
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
 
-            // أبها
-            { name: "مستشفى عسير المركزي", city: "أبها", category: "مستشفيات", icon: "🏥", lat: 18.2200, lng: 42.5050, query: "Aseer+Central+Hospital" },
-            { name: "مستشفى أبها الخاص", city: "أبها", category: "مستشفيات", icon: "🏥", lat: 18.2300, lng: 42.5100, query: "Abha+Private+Hospital" },
-            { name: "مستشفى الحياة الوطني - عسير", city: "أبها", category: "مستشفيات", icon: "🏥", lat: 18.2400, lng: 42.5200, query: "Al+Hayat+National+Hospital+Abha" },
-            { name: "جامعة الملك خالد", city: "أبها", category: "جامعات", icon: "🎓", lat: 18.2626, lng: 42.5714, query: "King+Khalid+University+Abha" },
-            { name: "عسير مول", city: "أبها", category: "مراكز تجارية", icon: "🛍️", lat: 18.2250, lng: 42.5150, query: "Aseer+Mall" },
-            { name: "أبها مول", city: "أبها", category: "مراكز تجارية", icon: "🛍️", lat: 18.2350, lng: 42.5250, query: "Abha+Mall" },
-            { name: "مطعم البيك - أبها", city: "أبها", category: "مطاعم", icon: "🍽️", lat: 18.2210, lng: 42.5080, query: "ALBAIK+Abha" },
-            { name: "مطعم بيتك - أبها", city: "أبها", category: "مطاعم", icon: "🍽️", lat: 18.2280, lng: 42.5120, query: "Baytak+Restaurant+Abha" },
-            { name: "كافيه حروف - أبها", city: "أبها", category: "كافيهات", icon: "☕", lat: 18.2320, lng: 42.5180, query: "Huroof+Cafe+Abha" },
-            { name: "أمانة منطقة عسير", city: "أبها", category: "دوائر حكومية", icon: "🏛️", lat: 18.2150, lng: 42.5000, query: "Aseer+Region+Municipality" },
+      if (data.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#6c757d;">لا توجد نتائج تطابق بحثك.</p>';
+        return;
+      }
 
-            // القصيم (تصحيح إملائي بريدة)
-            { name: "مستشفى الملك فهد التخصصي ببريدة", city: "القصيم", category: "مستشفيات", icon: "🏥", lat: 26.3300, lng: 43.9700, query: "King+Fahd+Specialist+Hospital+Buraidah" },
-            { name: "مستشفى بريدة المركزي", city: "القصيم", category: "مستشفيات", icon: "🏥", lat: 26.3200, lng: 43.9600, query: "Buraidah+Central+Hospital" },
-            { name: "جامعة القصيم", city: "القصيم", category: "جامعات", icon: "🎓", lat: 26.3500, lng: 43.7600, query: "Qassim+University" },
-            { name: "النخيل بلازا - بريدة", city: "القصيم", category: "مراكز تجارية", icon: "🛍️", lat: 26.3250, lng: 43.9750, query: "Al+Nakheel+Plaza+Buraidah" },
-            { name: "العثيم مول - بريدة", city: "القصيم", category: "مراكز تجارية", icon: "🛍️", lat: 26.3350, lng: 43.9850, query: "Othaim+Mall+Buraidah" },
-            { name: "مطعم البيك - القصيم", city: "القصيم", category: "مطاعم", icon: "🍽️", lat: 26.3280, lng: 43.9720, query: "ALBAIK+Buraidah" },
-            { name: "ستارباكس - القصيم", city: "القصيم", category: "كافيهات", icon: "☕", lat: 26.3320, lng: 43.9780, query: "Starbucks+Buraidah" },
-            { name: "أمانة منطقة القصيم", city: "القصيم", category: "دوائر حكومية", icon: "🏛️", lat: 26.3260, lng: 43.9680, query: "Qassim+Region+Municipality" },
+      data.forEach(place => {
+        // إنشاء البطاقة
+        const card = document.createElement('div');
+        card.className = 'place-card';
+        card.innerHTML = `
+          <div class="place-title">${place.name}</div>
+          <div class="place-info">📍 ${place.city} - ${place.category}</div>
+          <div class="features-list">
+            <span class="badge ${place.elevator ? 'badge-available' : 'badge-unavailable'}">
+              ${place.elevator ? '🛗 مصعد متوفر' : '🚫 مصعد غير متوفر'}
+            </span>
+            <span class="badge ${place.parking ? 'badge-available' : 'badge-unavailable'}">
+              ${place.parking ? '🅿️ مواقف متوفرة' : '🚫 مواقف غير متوفرة'}
+            </span>
+            <span class="badge ${place.restroom ? 'badge-available' : 'badge-unavailable'}">
+              ${place.restroom ? '♿ دورة مياه متوفرة' : '🚫 دورة مياه غير متوفرة'}
+            </span>
+          </div>
+          <a href="${place.mapUrl}" target="_blank" class="map-btn">📍 فتح في خرائط Google</a>
+        `;
+        container.appendChild(card);
 
-            // حائل
-            { name: "مستشفى الملك خالد بحائل", city: "حائل", category: "مستشفيات", icon: "🏥", lat: 27.5200, lng: 41.7000, query: "King+Khalid+Hospital+Hail" },
-            { name: "مستشفى حائل العام", city: "حائل", category: "مستشفيات", icon: "🏥", lat: 27.5100, lng: 41.6900, query: "Hail+General+Hospital" },
-            { name: "جامعة حائل", city: "حائل", category: "جامعات", icon: "🎓", lat: 27.4650, lng: 41.7200, query: "University+of+Hail" },
-            { name: "حائل مول", city: "حائل", category: "مراكز تجارية", icon: "🛍️", lat: 27.5150, lng: 41.7050, query: "Hail+Mall" },
-            { name: "جراند مول حائل", city: "حائل", category: "مراكز تجارية", icon: "🛍️", lat: 27.5250, lng: 41.7150, query: "Grand+Mall+Hail" },
-            { name: "مطعم البيك - حائل", city: "حائل", category: "مطاعم", icon: "🍽️", lat: 27.5180, lng: 41.7020, query: "ALBAIK+Hail" },
-            { name: "ستارباكس - حائل", city: "حائل", category: "كافيهات", icon: "☕", lat: 27.5220, lng: 41.7080, query: "Starbucks+Hail" },
-            { name: "أمانة منطقة حائل", city: "حائل", category: "دوائر حكومية", icon: "🏛️", lat: 27.5120, lng: 41.6950, query: "Hail+Municipality" }
-        ];
+        // إضافة الدبوس للخريطة
+        const marker = L.marker([place.lat, place.lng]).addTo(map)
+          .bindPopup(`<b>${place.name}</b><br>${place.city}`);
+        markers.push(marker);
+      });
+    }
 
-        let selectedCity = 'الكل';
-        let map, markersLayer;
+    // --- 4. دالة الفلترة والبحث ---
+    function filterPlaces() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      const cityVal = document.getElementById('citySelect').value;
+      const categoryVal = document.getElementById('categorySelect').value;
 
-        function initMap() {
-            map = L.map('map').setView([24.7136, 46.6753], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-            markersLayer = L.layerGroup().addTo(map);
-        }
+      const filtered = placesData.filter(place => {
+        const matchesSearch = place.name.toLowerCase().includes(searchVal);
+        const matchesCity = cityVal === "" || place.city === cityVal;
+        const matchesCategory = categoryVal === "" || place.category === categoryVal;
+        return matchesSearch && matchesCity && matchesCategory;
+      });
 
-        function filterCity(city, btn) {
-            selectedCity = city;
-            document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderLocations();
-        }
+      renderPlaces(filtered);
+    }
 
-        function renderLocations() {
-            const listEl = document.getElementById('locationsList');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            listEl.innerHTML = '';
-            markersLayer.clearLayers();
-
-            const filtered = places.filter(p => {
-                const matchCity = selectedCity === 'الكل' || p.city === selectedCity;
-                const matchSearch = p.name.toLowerCase().includes(searchVal) || p.category.includes(searchVal);
-                return matchCity && matchSearch;
-            });
-
-            filtered.forEach(p => {
-                const marker = L.marker([p.lat, p.lng]).bindPopup(`<b>${p.name}</b><br>${p.city}`);
-                markersLayer.addLayer(marker);
-
-                const card = document.createElement('div');
-                card.className = 'location-card';
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="card-title">${p.name} ${p.icon}</div>
-                        <div class="card-subtitle">📍 ${p.city} • ${p.category}</div>
-                    </div>
-                    <div class="tags-container">
-                        <span class="tag tag-green">مصعد مجهز ♿</span>
-                        <span class="tag tag-blue">موقف مخصص ♿</span>
-                        <span class="tag tag-green">دورة مجهزة ♿</span>
-                    </div>
-                    <a class="maps-btn" href="https://www.google.com/maps/search/?api=1&query=${p.query}" target="_blank">
-                        عرض الموقع على خرائط Google
-                    </a>
-                `;
-                listEl.appendChild(card);
-            });
-
-            if (filtered.length > 0 && selectedCity !== 'الكل') {
-                map.setView([filtered[0].lat, filtered[0].lng], 11);
-            }
-        }
-
-        window.onload = () => {
-            initMap();
-            renderLocations();
-        };
-    </script>
+    // التشغيل الأولي
+    renderPlaces(placesData);
+  </script>
 </body>
 </html>
