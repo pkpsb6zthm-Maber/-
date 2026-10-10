@@ -206,13 +206,15 @@
 
   <!-- أدوات التصفية والبحث -->
   <div class="controls-container">
-    <input type="text" id="searchInput" placeholder="🔍 ابحث عن موقع أو كلية..." oninput="filterPlaces()">
+    <input type="text" id="searchInput" placeholder="🔍 ابحث عن موقع أو منشأة..." oninput="filterPlaces()">
     
     <select id="citySelect" onchange="filterPlaces()">
       <option value="">جميع المدن</option>
       <option value="جدة">جدة</option>
       <option value="الرياض">الرياض</option>
       <option value="مكة">مكة</option>
+      <option value="المدينة المنورة">المدينة المنورة</option>
+      <option value="الدمام">الدمام</option>
     </select>
 
     <select id="categorySelect" onchange="filterPlaces()">
@@ -241,9 +243,9 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // --- 1. مصفوفة البيانات الشاملة (مع الأماكن القديمة والتعديلات الجديدة) ---
+    // --- مصفوفة البيانات الشاملة (جميع المدن والأماكن القديمة كاملة + التعديلات المطلوبة) ---
     const placesData = [
-      // ✏️ [تعديل] كلية الاتصالات - (مصعد ومواقف غير متوفرة)
+      // 1. التعديل على كلية الاتصالات (مصعد ومواقف غير متوفرة)
       {
         id: 1,
         name: "كلية الاتصالات والمعلومات",
@@ -256,7 +258,7 @@
         lng: 39.2431,
         mapUrl: "https://maps.google.com/?q=21.4880,39.2431"
       },
-      // ➕ [إضافة جديدة] جامعة الملك عبدالعزيز - (متوفر كل شيء)
+      // 2. إضافة جامعة الملك عبدالعزيز الجديدة (متوفر كل شيء)
       {
         id: 2,
         name: "جامعة الملك عبدالعزيز",
@@ -269,7 +271,7 @@
         lng: 39.2452,
         mapUrl: "https://maps.google.com/?q=King+Abdulaziz+University+Jeddah"
       },
-      // 📌 المواقع القديمة كاملة بدون حذف
+      // 3. بقية المواقع والمدن القديمة كاملاً بدون أي نقص
       {
         id: 3,
         name: "جامعة جدة",
@@ -320,6 +322,42 @@
       },
       {
         id: 7,
+        name: "جامعة الملك سعود",
+        city: "الرياض",
+        category: "جامعات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 24.7210,
+        lng: 46.6280,
+        mapUrl: "https://maps.google.com/?q=King+Saud+University"
+      },
+      {
+        id: 8,
+        name: "مستشفى الملك فهد بالرياض",
+        city: "الرياض",
+        category: "مستشفيات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 24.6850,
+        lng: 46.7220,
+        mapUrl: "https://maps.google.com/?q=24.6850,46.7220"
+      },
+      {
+        id: 9,
+        name: "إمارة منطقة مكة المكرمة",
+        city: "مكة",
+        category: "قطاع حكومي",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 21.4225,
+        lng: 39.8262,
+        mapUrl: "https://maps.google.com/?q=21.4225,39.8262"
+      },
+      {
+        id: 10,
         name: "مطعم البرج",
         city: "جدة",
         category: "مطاعم",
@@ -331,7 +369,7 @@
         mapUrl: "https://maps.google.com/?q=21.5855,39.1411"
       },
       {
-        id: 8,
+        id: 11,
         name: "كافيه المساء",
         city: "جدة",
         category: "كافيهات",
@@ -341,13 +379,48 @@
         lat: 21.5622,
         lng: 39.1589,
         mapUrl: "https://maps.google.com/?q=21.5622,39.1589"
+      },
+      {
+        id: 12,
+        name: "مستشفى حراء العام",
+        city: "مكة",
+        category: "مستشفيات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 21.4735,
+        lng: 39.8642,
+        mapUrl: "https://maps.google.com/?q=21.4735,39.8642"
+      },
+      {
+        id: 13,
+        name: "جامعة طيبة",
+        city: "المدينة المنورة",
+        category: "جامعات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 24.4709,
+        lng: 39.6122,
+        mapUrl: "https://maps.google.com/?q=Taibah+University"
+      },
+      {
+        id: 14,
+        name: "جامعة الملك فهد للبترول والمعادن",
+        city: "الدمام",
+        category: "جامعات",
+        elevator: true,
+        parking: true,
+        restroom: true,
+        lat: 26.4115,
+        lng: 50.1420,
+        mapUrl: "https://maps.google.com/?q=KFUPM"
       }
     ];
 
-    // --- 2. تهيئة الخريطة ---
-    const map = L.map('map').setView([21.4883, 39.2452], 12);
+    // --- تهيئة الخريطة ---
+    const map = L.map('map').setView([21.4883, 39.2452], 6);
     
-    // إضافية طبقة الخريطة (OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
@@ -355,12 +428,11 @@
 
     let markers = [];
 
-    // --- 3. دالة عرض الأماكن والخريطة ---
+    // --- دالة عرض الأماكن والخريطة ---
     function renderPlaces(data) {
       const container = document.getElementById('placesContainer');
       container.innerHTML = '';
 
-      // مسح الدبابيس القديمة من الخريطة
       markers.forEach(m => map.removeLayer(m));
       markers = [];
 
@@ -370,7 +442,6 @@
       }
 
       data.forEach(place => {
-        // إنشاء البطاقة
         const card = document.createElement('div');
         card.className = 'place-card';
         card.innerHTML = `
@@ -391,14 +462,13 @@
         `;
         container.appendChild(card);
 
-        // إضافة الدبوس للخريطة
         const marker = L.marker([place.lat, place.lng]).addTo(map)
           .bindPopup(`<b>${place.name}</b><br>${place.city}`);
         markers.push(marker);
       });
     }
 
-    // --- 4. دالة الفلترة والبحث ---
+    // --- دالة الفلترة والبحث ---
     function filterPlaces() {
       const searchVal = document.getElementById('searchInput').value.toLowerCase();
       const cityVal = document.getElementById('citySelect').value;
