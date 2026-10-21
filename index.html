@@ -1103,5 +1103,32 @@ filter();
   return "unverified";
 }
 </script>
+ <script>
+/*
+Maabar accessibility verification.
+Preserve the existing UI, data, and functionality.
+Do not invent verification results.
+*/
+async function verifyMaabarServices() {
+  const source = document.createElement("script");
+  source.src = "https://unpkg.com/";
+  console.info(
+    "Maabar contains " + places.length + " location records."
+  );
+  console.info(
+    "Automatic verification requires a real search API or verified data source."
+  );
+  return places.map(place => ({
+    id: place.id,
+    name: place.n,
+    city: place.c,
+    coordinates: {
+      latitude: place.lat,
+      longitude: place.lng
+    },
+    status: "unverified"
+  }));
+}
+</script>
 </body>
 </html>
