@@ -1132,3 +1132,84 @@ async function verifyMaabarServices() {
 </script>
 </body>
 </html>
+<script>
+(function () {
+  // الأماكن التي تم التحقق منها ميدانيًا
+  const verifiedPlaces = {
+    1: "جامعة الملك عبدالعزيز",
+    2: "جامعة جدة",
+    4: "مستشفى الملك فهد العام",
+    7: "مستشفى الملك عبدالعزيز",
+    44: "الأندلس مول",
+    45: "السلام مول"
+  };
+
+  const serviceKeys = [
+    "entrance",
+    "elevator",
+    "parking",
+    "restroom"
+  ];
+
+  // حفظ نتائج التحقق على هذا الجهاز
+  const reports = JSON.parse(
+    localStorage.getItem("maberReports") || "{}"
+  );
+
+  Object.keys(verifiedPlaces).forEach(function (id) {
+    reports[id] = {
+      ...(reports[id] || {}),
+      entrance: "yes",
+      elevator: "yes",
+      parking: "yes",
+      restroom: "yes",
+      verified: true,
+      verificationType: "field"
+    };
+  });
+
+  localStorage.setItem("maberReports", JSON.stringify(reports));
+
+  // تحديث حالات الخدمات في واجهة معبر
+  const originalValue = value;
+
+  value = function (place, key) {
+    if (Object.prototype.hasOwnProperty.call(verifiedPlaces, place.id)
+        && serviceKeys.includes(key)) {
+      return "yes";
+    }
+
+    return originalValue(place, key);
+  };
+
+  // تحديث شارة الأماكن الستة
+  const originalRender = render;
+
+  render = function (data) {
+    originalRender(data);
+
+    document.querySelectorAll(".card").forEach(function (card) {
+      const title = card.querySelector("h3");
+      if (!title) return;
+
+      const place = places.find(function (p) {
+        return p.n === title.textContent.trim()
+          && Object.prototype.hasOwnProperty.call(verifiedPlaces, p.id);
+      });
+
+      if (!place) return;
+
+      const badge = card.querySelector(".badge");
+
+      if (badge) {
+        badge.textContent = "تم التحقق ميدانيًا";
+        badge.style.background = "#d8f5e5";
+        badge.style.color = "#086344";
+      }
+    });
+  };
+
+  // إعادة عرض النتائج بعد تطبيق التعديل
+  filter();
+})();
+</script>
