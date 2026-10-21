@@ -1091,6 +1091,17 @@ document.getElementById("search").onclick=filter;
 filters();
 setupMap();
 filter();
+ function updateServiceStatus(service, evidence) {
+  if (evidence?.verified === true && evidence?.available === true) {
+    return "available";
+  }
+
+  if (evidence?.verified === true && evidence?.available === false) {
+    return "unavailable";
+  }
+
+  return "unverified";
+}
 </script>
 </body>
 </html>
