@@ -136,10 +136,7 @@ width:min(39%,390px);
 opacity:.96
 }
 
-.hero-art svg{
-width:100%;
-height:auto
-}
+.hero-art svg{width:100%;height:auto}
 
 .hero:after{
 content:"";
@@ -197,10 +194,7 @@ color:#fff
 
 .btn:hover{background:var(--green2)}
 
-.section{
-padding-top:34px;
-padding-bottom:12px
-}
+.section{padding-top:34px;padding-bottom:12px}
 
 .heading{
 display:flex;
@@ -338,7 +332,7 @@ border-radius:20px;
 padding:6px 9px;
 font-size:11px;
 font-weight:900;
-white-space:nowrap
+white-space:normal
 }
 
 .features{
@@ -425,11 +419,7 @@ padding:20px
 }
 
 .step .emoji{font-size:29px}
-
-.step h3{
-margin:8px 0;
-font-size:18px
-}
+.step h3{margin:8px 0;font-size:18px}
 
 .step p{
 color:var(--muted);
@@ -482,10 +472,7 @@ border-radius:22px;
 padding:23px
 }
 
-.modal h3{
-font-size:23px;
-margin:0 0 6px
-}
+.modal h3{font-size:23px;margin:0 0 6px}
 
 .modal p{
 color:var(--muted);
@@ -549,7 +536,6 @@ header{height:70px}
 .count{font-size:12px}
 .cardtop{gap:7px}
 .placetitle h3{font-size:16px}
-.badge{white-space:normal}
 .formgrid{grid-template-columns:1fr}
 .formgroup.full{grid-column:auto}
 }
@@ -623,8 +609,8 @@ header{height:70px}
  <div class="chips" id="chips"></div>
 
  <div class="notice">
-  ⚠️ <b>تنبيه مهم:</b>
-  مواقع بعض الفروع تقريبية وتحتاج مراجعة. لا توجد لدينا حاليًا بيانات موثقة لكل المواقف والمصاعد ودورات المياه. لذلك تظهر هذه الخصائص «غير مؤكدة» حتى يجري التحقق منها، حفاظًا على سلامة الزوار.
+  ♿ <b>معلومات المرافق:</b>
+  تظهر المرافق في المولات والجامعات والكليات والمستشفيات بحالة «متوقع توفره — يحتاج تحقق». تحقق من الفرع قبل الزيارة، لأن المرافق قد تختلف بين المواقع والفروع.
  </div>
 
  <div class="layout">
@@ -840,9 +826,17 @@ parking:"مواقف مخصصة",
 restroom:"دورة مياه"
 };
 
+const facilityCategories=[
+"مولات وأسواق",
+"جامعات",
+"مستشفيات",
+"كليات"
+];
+
 let chosen="";
 let map=null;
 let markers=[];
+let currentId=null;
 
 function esc(s){
 return String(s).replace(/[&<>"']/g,c=>({
@@ -862,12 +856,30 @@ return {}
 }
 }
 
+/* التعديل: تحديد حالة المرافق حسب التصنيف والتحديثات المحفوظة */
 function value(p,k){
-return (reports()[p.id]||{})[k]||"unknown"
+const savedReports=reports();
+const placeReport=savedReports[p.id]||{};
+
+/* إذا أرسل المستخدم تحديثًا صريحًا، نعرضه */
+if(placeReport[k] && placeReport[k]!=="unknown"){
+return placeReport[k];
+}
+
+/* هذه التصنيفات يُتوقع وجود بعض المرافق فيها،
+   لكن يلزم التحقق من كل فرع قبل اعتمادها */
+if(facilityCategories.includes(p.k)){
+return "likely";
+}
+
+return placeReport[k]||"unknown";
 }
 
 function valueText(v){
-return v==="yes"?"متوفر":v==="no"?"غير متوفر":"غير مؤكد"
+if(v==="yes")return "متوفر";
+if(v==="no")return "غير متوفر";
+if(v==="likely")return "متوقع توفره — يحتاج تحقق";
+return "غير مؤكد";
 }
 
 function mapUrl(p){
@@ -878,7 +890,7 @@ encodeURIComponent(p.n+" "+p.c+" السعودية")
 function setupMap(){
 if(!window.L){
 document.getElementById("map").innerHTML="الخريطة غير متاحة حاليًا";
-return
+return;
 }
 
 map=L.map("map").setView([23.8,45.2],5);
@@ -886,7 +898,7 @@ map=L.map("map").setView([23.8,45.2],5);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
 maxZoom:19,
 attribution:"© OpenStreetMap"
-}).addTo(map)
+}).addTo(map);
 }
 
 function paintMap(data){
@@ -904,16 +916,16 @@ esc(p.c)+"<br>"+
 "<a target='_blank' rel='noopener' href='"+mapUrl(p)+"'>افتح في خرائط Google</a>"
 );
 
-markers.push(m)
+markers.push(m);
 });
 
 if(markers.length===1){
-map.setView(markers[0].getLatLng(),13)
+map.setView(markers[0].getLatLng(),13);
 }else if(markers.length>1){
 map.fitBounds(
 L.featureGroup(markers).getBounds().pad(.12),
 {maxZoom:12}
-)
+);
 }
 }
 
@@ -925,10 +937,16 @@ let el=document.getElementById("cards");
 if(!data.length){
 el.innerHTML='<div class="empty">ما لقينا نتائج. جرّب البحث باسم آخر أو اختر كل المدن.</div>';
 paintMap([]);
-return
+return;
 }
 
-el.innerHTML=data.map(p=>`
+el.innerHTML=data.map(p=>{
+const expected=facilityCategories.includes(p.k);
+const badge=expected
+?"المرافق المتوقعة تحتاج تحقق"
+:"المرافق غير مؤكدة";
+
+return `
 <article class="card">
  <div class="cardtop">
   <div class="placetitle">
@@ -938,7 +956,7 @@ el.innerHTML=data.map(p=>`
     <div class="sub">📍 ${esc(p.c)} · ${esc(p.k)}</div>
    </div>
   </div>
-  <span class="badge">المرافق غير مؤكدة</span>
+  <span class="badge">${badge}</span>
  </div>
 
  <div class="features">
@@ -951,10 +969,10 @@ el.innerHTML=data.map(p=>`
   <a class="action main" target="_blank" rel="noopener" href="${mapUrl(p)}">📍 خرائط Google</a>
   <button class="action" onclick="openReport(${p.id})">✍️ أرسل تحديثًا</button>
  </div>
-</article>
-`).join("");
+</article>`;
+}).join("");
 
-paintMap(data)
+paintMap(data);
 }
 
 function filter(){
@@ -969,7 +987,7 @@ let data=places.filter(p=>
 (!chosen||p.k===chosen)
 );
 
-render(data)
+render(data);
 }
 
 function filters(){
@@ -981,11 +999,11 @@ let cats=[...new Set(places.map(p=>p.k))]
 
 document.getElementById("city").innerHTML=
 '<option value="">كل مدن السعودية</option>'+
-cities.map(x=>`<option>${esc(x)}</option>`).join("");
+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
 
 document.getElementById("category").innerHTML=
 '<option value="">كل التصنيفات</option>'+
-cats.map(x=>`<option>${esc(x)}</option>`).join("");
+cats.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
 
 document.getElementById("chips").innerHTML=
 ['الكل',...cats].map(x=>`
@@ -1003,12 +1021,10 @@ x.classList.toggle("active",x===b)
 );
 
 document.getElementById("category").value=chosen;
-filter()
+filter();
+};
+});
 }
-})
-}
-
-let currentId=null;
 
 function openReport(id){
 currentId=id;
@@ -1020,20 +1036,20 @@ document.getElementById("modalPlace").textContent=
 p.n+" — "+p.c+". حدّث فقط المعلومات التي تحققت منها.";
 
 for(let k of Object.keys(feat)){
-document.getElementById(k).value=r[k]||"unknown"
+document.getElementById(k).value=r[k]||"unknown";
 }
 
 document.getElementById("notes").value=r.notes||"";
-document.getElementById("modal").classList.add("open")
+document.getElementById("modal").classList.add("open");
 }
 
 document.getElementById("cancel").onclick=()=>{
-document.getElementById("modal").classList.remove("open")
+document.getElementById("modal").classList.remove("open");
 };
 
 document.getElementById("modal").onclick=e=>{
 if(e.target.id==="modal"){
-e.currentTarget.classList.remove("open")
+e.currentTarget.classList.remove("open");
 }
 };
 
@@ -1054,7 +1070,7 @@ localStorage.setItem("maberReports",JSON.stringify(all));
 document.getElementById("modal").classList.remove("open");
 filter();
 
-alert("حُفظ التحديث على هذا الجهاز فقط. يلزم ربط قاعدة بيانات مشتركة ليظهر للآخرين.")
+alert("حُفظ التحديث على هذا الجهاز فقط. يلزم ربط قاعدة بيانات مشتركة ليظهر للآخرين.");
 };
 
 document.getElementById("q").addEventListener("input",filter);
@@ -1067,7 +1083,7 @@ document.querySelectorAll(".chip").forEach(b=>
 b.classList.toggle("active",!b.dataset.k)
 );
 
-filter()
+filter();
 });
 
 document.getElementById("search").onclick=filter;
